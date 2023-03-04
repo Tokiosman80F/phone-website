@@ -35,7 +35,13 @@ const displayPhone = (phone, datalimit) => {
        <h5 class="card-title">${element.phone_name}</h5>
         <p class="card-text">This is a longer card with supporting text below as a natural lead-in
         to additional content. This content is a little bit longer.</p>
-     </div>
+        
+        <button onclick="loadDetail('${element.slug}')" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#showDetailModal">Show Detail</button>
+
+        
+
+
+        </div>
     </div>
     `;
     phoneContainer.appendChild(phoneDiv);
@@ -50,9 +56,18 @@ function processSearch(datalimit) {
   loadPhones(searchText, datalimit);
   loadSpiner(true);
 }
+// mouse click
 document.getElementById("search-btn").addEventListener("click", function () {
   processSearch(10);
 });
+// enter clicked
+document
+  .getElementById("search-feild")
+  .addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      processSearch(10);
+    }
+  });
 // show all btn
 document.getElementById("showall-btn").addEventListener("click", function () {
   processSearch();
@@ -65,3 +80,31 @@ const loadSpiner = (isLoading) => {
     spinner.classList.remove("d-none");
   } else spinner.classList.add("d-none");
 };
+
+const loadDetail = async (id) => {
+  const url = `https://openapi.programming-hero.com/api/phone/${id}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  displayPhoneDetail(data.data);
+};
+const displayPhoneDetail = (detail) => {
+  console.log(detail);
+  document.getElementById("showDetailModalLabel").innerText = `${detail.name}`;
+  document.getElementById("modal-body").innerHTML = `
+  <h4>Main Feature</h4>
+  <hr>
+  <p>Storage :${
+    detail.mainFeatures ? detail.mainFeatures.storage : "No data found"
+  }</p>
+  <p>Display Size : ${
+    detail.mainFeatures ? detail.mainFeatures.displaySize : "No data found"
+  }</p>
+  <p>Chipset : ${
+    detail.mainFeatures ? detail.mainFeatures.chipSet : "No data found"
+  }</p>
+  <p>Memory : ${
+    detail.mainFeatures ? detail.mainFeatures.memory : "No data found"
+  }</p>
+  `;
+};
+loadPhones("apple");
